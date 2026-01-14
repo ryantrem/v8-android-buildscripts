@@ -28,23 +28,23 @@ jobs:
         EXTERNAL_STARTUP_DATA: ${{ matrix.external-startup-data == 'snapshot' }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Disk space before cleanup
+        run: df -h
 
       - name: Free disk space
-        run: |
-          echo "Disk space before cleanup:"
-          df -h
-          for dir in /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL; do
-            if [ -d "$dir" ]; then
-              echo "Removing $dir..."
-              sudo rm -rf "$dir"
-              echo "Removed $dir"
-            else
-              echo "Skipping $dir (not found)"
-            fi
-          done
-          echo "Disk space after cleanup:"
-          df -h
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          swap-storage: false
+
+      - name: Disk space after cleanup
+        run: df -h
+
+      - uses: actions/checkout@v3
 
       - name: Setup Ubuntu environment
         run: |
