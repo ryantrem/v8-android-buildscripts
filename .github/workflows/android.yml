@@ -49,7 +49,7 @@ jobs:
           sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
           sudo apt-get update
           sudo apt-get upgrade -y
-          sudo apt-get install -y apt-utils sudo lsb-core git python-is-python3 python3-pip nodejs npm wget openjdk-8-jre openjdk-8-jdk build-essential pkg-config libglib2.0-dev
+          sudo apt-get install -y apt-utils sudo lsb-release git python-is-python3 python3-pip nodejs npm wget openjdk-8-jre openjdk-8-jdk build-essential pkg-config libglib2.0-dev
 
       - name: Export settings from npm package
         run: npm run export_npm_env
