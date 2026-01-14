@@ -36,13 +36,35 @@ fi
 gclient config --name v8 --unmanaged "https://chromium.googlesource.com/v8/v8.git"
 
 if [[ ${PLATFORM} = "ios" ]]; then
-  gclient sync --deps=ios ${GCLIENT_SYNC_ARGS}
+  # First sync may fail due to third_party/requests tag issue, allow it to fail
+  gclient sync --deps=ios ${GCLIENT_SYNC_ARGS} || true
+
+  # Fix third_party/requests tag issue - replace tag reference with commit hash
+  # The v2.23.0 tag may not be fetchable from the chromium mirror, use commit hash instead
+  # Commit hash determined from: https://github.com/psf/requests/releases/tag/v2.23.0
+  # (c7e0fc087ceeadb8b4c84a0953a422c474093d6d is the commit that v2.23.0 tag points to)
+  if [[ -f "${V8_DIR}/DEPS" ]]; then
+    sed -i "" "s|refs/tags/v2.23.0|c7e0fc087ceeadb8b4c84a0953a422c474093d6d|g" "${V8_DIR}/DEPS"
+  fi
+
+  # Retry sync after DEPS fix
+  gclient sync --deps=ios
   exit 0
 fi
 
 if [[ ${PLATFORM} = "android" ]]; then
+  # First sync may fail due to third_party/requests tag issue, allow it to fail
   gclient sync --deps=android ${GCLIENT_SYNC_ARGS} || true
-  sed -i "s#2c2138e811487b13020eb331482fb991fd399d4e#083aa67a0d3309ebe37eafbe7bfd96c235a019cf#g" v8/DEPS
+
+  # Fix third_party/requests tag issue - replace tag reference with commit hash
+  # The v2.23.0 tag may not be fetchable from the chromium mirror, use commit hash instead
+  # Commit hash determined from: https://github.com/psf/requests/releases/tag/v2.23.0
+  # (c7e0fc087ceeadb8b4c84a0953a422c474093d6d is the commit that v2.23.0 tag points to)
+  if [[ -f "${V8_DIR}/DEPS" ]]; then
+    sed -i "s|refs/tags/v2.23.0|c7e0fc087ceeadb8b4c84a0953a422c474093d6d|g" "${V8_DIR}/DEPS"
+  fi
+
+  # Retry sync after DEPS fix
   gclient sync --deps=android
 
   # Patch build-deps installer for snapd not available in docker
@@ -81,6 +103,10 @@ fi
 if [[ ${PLATFORM} = "macos_android" ]]; then
   gclient sync --deps=android ${GCLIENT_SYNC_ARGS} || true
   sed -i "" "s#2c2138e811487b13020eb331482fb991fd399d4e#083aa67a0d3309ebe37eafbe7bfd96c235a019cf#g" v8/DEPS
+  # Fix third_party/requests tag issue - replace tag reference with commit hash
+  # Commit hash determined from: https://github.com/psf/requests/releases/tag/v2.23.0
+  # (c7e0fc087ceeadb8b4c84a0953a422c474093d6d is the commit that v2.23.0 tag points to)
+  sed -i "" "s|refs/tags/v2.23.0|c7e0fc087ceeadb8b4c84a0953a422c474093d6d|g" v8/DEPS
   gclient sync --deps=android
 
   installNDK "darwin"
