@@ -9,7 +9,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     strategy:
       matrix:
@@ -45,76 +45,44 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup Ubuntu environment
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} -e DEBIAN_FRONTEND=${{ env.DEBIAN_FRONTEND }} -e TZ=${{ env.TZ }}
-          run: |
-            sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
-            sudo apt-get update
-            sudo apt-get upgrade -y
-            sudo apt-get install -y apt-utils sudo lsb-core git python nodejs npm wget openjdk-8-jre openjdk-8-jdk
+        run: |
+          sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y apt-utils sudo lsb-core git python-is-python3 python3-pip nodejs npm wget openjdk-8-jre openjdk-8-jdk build-essential pkg-config libglib2.0-dev
 
       - name: Export settings from npm package
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }}
-          run: npm run export_npm_env
+        run: npm run export_npm_env
+
+      # - uses: actions/cache@v3
+      #   with:
+      #     path: v8
+      #     key: android-v8-${{ env.V8_VERSION }}-${{ env.CACHE_KEY_SUFFIX }}
 
       - name: Setup V8 build environment
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} -e DEBIAN_FRONTEND=${{ env.DEBIAN_FRONTEND }}
-          run: |
-            source ${{ github.workspace }}/scripts/export_npm_env.sh 2>/dev/null || npm run export_npm_env
-            scripts/setup.sh -r $V8_VERSION android
-            sudo apt-get install -y libatomic1-i386-cross && sudo sh -c 'echo "/usr/i686-linux-gnu/lib" >> /etc/ld.so.conf.d/i386-linux-gnu.conf' && sudo ldconfig
+        run: |
+          scripts/setup.sh -r ${{ env.V8_VERSION }} android
+          sudo apt-get install -y libatomic1-i386-cross && sudo sh -c 'echo "/usr/i686-linux-gnu/lib" >> /etc/ld.so.conf.d/i386-linux-gnu.conf' && sudo ldconfig
 
       - name: Patch V8
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }}
-          run: scripts/patch.sh android
+        run: scripts/patch.sh android
 
       - name: Build V8 arm
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} -e NO_INTL=${{ env.NO_INTL }} -e NO_JIT=${{ env.NO_JIT }} -e EXTERNAL_STARTUP_DATA=${{ env.EXTERNAL_STARTUP_DATA }}
-          run: scripts/build.sh android arm
+        run: scripts/build.sh android arm
 
       - name: Build V8 x86
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} -e NO_INTL=${{ env.NO_INTL }} -e NO_JIT=${{ env.NO_JIT }} -e EXTERNAL_STARTUP_DATA=${{ env.EXTERNAL_STARTUP_DATA }}
-          run: scripts/build.sh android x86
+        run: scripts/build.sh android x86
 
       - name: Build V8 arm64
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} -e NO_INTL=${{ env.NO_INTL }} -e NO_JIT=${{ env.NO_JIT }} -e EXTERNAL_STARTUP_DATA=${{ env.EXTERNAL_STARTUP_DATA }}
-          run: scripts/build.sh android arm64
+        run: scripts/build.sh android arm64
 
       - name: Build V8 x64
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }} -e NO_INTL=${{ env.NO_INTL }} -e NO_JIT=${{ env.NO_JIT }} -e EXTERNAL_STARTUP_DATA=${{ env.EXTERNAL_STARTUP_DATA }}
-          run: scripts/build.sh android x64
+        run: scripts/build.sh android x64
 
       - name: Archive
-        uses: addnab/docker-run-action@v3
-        with:
-          image: kudo/ubuntu-nonroot:20.04
-          options: -v ${{ github.workspace }}:${{ github.workspace }} -w ${{ github.workspace }}
-          run: |
-            scripts/archive.sh android
-            tar -cvf dist.tar dist
+        run: |
+          scripts/archive.sh android
+          tar -cvf dist.tar dist
 
       - uses: actions/upload-artifact@v4
         with:
