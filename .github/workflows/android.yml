@@ -13,11 +13,12 @@ jobs:
 
     strategy:
       matrix:
-        variant: [intl, nointl, jit-intl, jit-nointl]
-        external-startup-data: ['snapshot']
-        include:
-          - variant: jit-nointl
-            external-startup-data: 'nosnapshot'
+        # variant: [intl, nointl, jit-intl, jit-nointl]
+        variant: [jit-nointl]
+        external-startup-data: ['nosnapshot']
+        # include:
+        #   - variant: jit-nointl
+        #     external-startup-data: 'nosnapshot'
 
     container:
       image: kudo/ubuntu-nonroot:20.04
