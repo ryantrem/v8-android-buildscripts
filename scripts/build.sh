@@ -13,7 +13,7 @@ GN_ARGS_BASE="
   default_min_sdk_version=21
   v8_enable_sandbox=false
   v8_enable_pointer_compression=false
-  cppgc_enable_caged_heap=false
+  v8_enable_shared_ro_heap=false
 "
 
 if [[ ${PLATFORM} = "macos_android" ]]; then
