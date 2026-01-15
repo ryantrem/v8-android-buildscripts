@@ -9,7 +9,6 @@ ARCH=$2
 GN_ARGS_BASE="
   is_component_build=false
   use_custom_libcxx=false
-  icu_use_data_file=false
   treat_warnings_as_errors=false
   default_min_sdk_version=21
   v8_enable_sandbox=false
@@ -122,11 +121,15 @@ function buildArch()
     gn gen --args="${GN_ARGS_BASE} ${GN_ARGS_BUILD_TYPE} target_cpu=\"${arch}\"" "${output_dir}"
   fi
 
+  # Debug: list available GN args (uncomment to debug)
+  echo "=== Available GN args for ${output_dir} (first 200 lines) ==="
+  gn args --list "${output_dir}" | head -200
+
   if [[ ${TOOLS_ONLY} = "true" ]]; then
     date ; ninja ${NINJA_PARAMS} -C "${output_dir}" run_mksnapshot_default mkcodecache_group ; date
     copySnapshot "${arch}" "${output_dir}"
     copyMkcodecache "${arch}" "${output_dir}"
- else
+  else
     date ; ninja ${NINJA_PARAMS} -C "${output_dir}" ${target} run_mksnapshot_default mkcodecache_group ; date
     copyLib "${arch}" "${output_dir}" "${ios_env}"
     copySnapshot "${arch}" "${output_dir}"
