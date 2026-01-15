@@ -111,15 +111,22 @@ function buildArch()
   fi
 
   local output_dir=''
+  local gn_args=''
   if [[ ${PLATFORM} = "ios" ]]; then
     echo "Build v8 ${ios_env} ${arch} variant NO_INTL=${NO_INTL}"
     output_dir="out.v8.ios.${ios_env}.${arch}"
-    gn gen --args="${GN_ARGS_BASE} ${GN_ARGS_BUILD_TYPE} target_cpu=\"${arch}\" target_environment=\"${ios_env}\"" "${output_dir}"
+    gn_args="${GN_ARGS_BASE} ${GN_ARGS_BUILD_TYPE} target_cpu=\"${arch}\" target_environment=\"${ios_env}\""
   else
     echo "Build v8 ${arch} variant NO_INTL=${NO_INTL} NO_JIT=${NO_JIT}"
     output_dir="out.v8.${arch}"
-    gn gen --args="${GN_ARGS_BASE} ${GN_ARGS_BUILD_TYPE} target_cpu=\"${arch}\"" "${output_dir}"
+    gn_args="${GN_ARGS_BASE} ${GN_ARGS_BUILD_TYPE} target_cpu=\"${arch}\""
   fi
+  
+  echo "=== GN args being used ==="
+  echo "${gn_args}"
+  echo "=== Running gn gen ==="
+  gn gen --args="${gn_args}" "${output_dir}" || echo "gn gen exited with code $?"
+  echo "=== gn gen completed ==="
 
   # Debug: list available GN args (uncomment to debug)
   echo "=== Available GN args for ${output_dir} (first 200 lines) ==="
