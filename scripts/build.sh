@@ -12,6 +12,7 @@ GN_ARGS_BASE="
   treat_warnings_as_errors=false
   default_min_sdk_version=21
   v8_enable_sandbox=false
+  v8_enable_pointer_compression=false
 "
 
 if [[ ${PLATFORM} = "macos_android" ]]; then
@@ -129,8 +130,8 @@ function buildArch()
   echo "=== gn gen completed ==="
 
   # Debug: list available GN args (uncomment to debug)
-  echo "=== Available GN args for ${output_dir} (first 200 lines) ==="
-  gn args --list "${output_dir}" | head -200
+  echo "=== Available GN args for ${output_dir} ==="
+  gn args --list "${output_dir}"
 
   if [[ ${TOOLS_ONLY} = "true" ]]; then
     date ; ninja ${NINJA_PARAMS} -C "${output_dir}" run_mksnapshot_default mkcodecache_group ; date
