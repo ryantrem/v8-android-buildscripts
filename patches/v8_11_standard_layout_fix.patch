@@ -1,5 +1,4 @@
 diff --git a/src/execution/isolate-data.h b/src/execution/isolate-data.h
-index 0000000000..0000000001 100644
 --- a/src/execution/isolate-data.h
 +++ b/src/execution/isolate-data.h
 @@ -275,9 +275,13 @@ class IsolateData final {
