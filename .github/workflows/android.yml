@@ -62,20 +62,24 @@ jobs:
       - name: Patch V8
         run: scripts/patch.sh android
 
-      - name: Build V8 arm
-        run: scripts/build.sh android arm
+      # - name: Build V8 arm
+      #   run: scripts/build.sh android arm
 
-      - name: Build V8 x86
-        run: scripts/build.sh android x86
+      # - name: Build V8 x86
+      #   run: scripts/build.sh android x86
 
       - name: Build V8 arm64
         run: scripts/build.sh android arm64
 
-      - name: Build V8 x64
-        run: scripts/build.sh android x64
+      # - name: Build V8 x64
+      #   run: scripts/build.sh android x64
 
       - name: Archive
         run: |
+          # Clear system Android SDK paths - we use V8's bundled SDK
+          unset ANDROID_HOME
+          unset ANDROID_SDK_ROOT
+          unset ANDROID_NDK_HOME
           scripts/archive.sh android
           tar -cvf dist.tar dist
 
