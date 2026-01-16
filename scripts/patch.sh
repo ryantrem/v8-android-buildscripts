@@ -28,6 +28,10 @@ V8_PATCHSET_ANDROID=(
   # Fix for [react-native-bottom-sheet](https://github.com/gorhom/react-native-bottom-sheet) not working
   # revert https://chromium-review.googlesource.com/c/v8/v8/+/3548458
   "fix_for_bottom_sheet.patch"
+
+  # Fix V8 11.x std::is_standard_layout assertion failures
+  # ThreadLocalTop contains heap::base::Stack which has virtual methods
+  "v8_11_standard_layout_fix.patch"
 )
 
 V8_PATCHSET_IOS=(
