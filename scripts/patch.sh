@@ -32,10 +32,6 @@ V8_PATCHSET_ANDROID=(
   # Fix V8 11.x std::is_standard_layout assertion failures
   # ThreadLocalTop contains heap::base::Stack which has virtual methods
   "v8_11_standard_layout_fix.patch"
-
-  # 16KB page size support for Android 15+ devices
-  # https://developer.android.com/guide/practices/page-sizes
-  "v8_16kb_page_alignment.patch"
 )
 
 V8_PATCHSET_IOS=(
